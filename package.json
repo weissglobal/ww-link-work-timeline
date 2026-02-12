@@ -1,6 +1,9 @@
 {
   "name": "work-timeline",
   "version": "0.0.1",
+  "weweb": {
+    "type": "wwObject"
+  },
   "scripts": {
     "build": "weweb build",
     "serve": "weweb serve"
