@@ -78,6 +78,83 @@ export default {
       /* wwEditor:end */
     },
 
+    /* ── Members (org / team) ───────────────────────── */
+    members: {
+      label: { en: 'Members' },
+      type: 'Array',
+      section: 'settings',
+      bindable: true,
+      defaultValue: [],
+      options: {
+        expandable: true,
+        getItemLabel(item) {
+          return item?.name || item?.full_name || `Member ${item?.id || 'Unknown'}`;
+        },
+        item: {
+          type: 'Object',
+          defaultValue: { id: '', name: '', avatar: '', role: '' },
+          options: {
+            item: {
+              id: { label: { en: 'Member ID' }, type: 'Text' },
+              name: { label: { en: 'Name' }, type: 'Text' },
+              avatar: { label: { en: 'Avatar URL' }, type: 'Text' },
+              role: { label: { en: 'Role' }, type: 'Text' },
+            },
+          },
+        },
+      },
+      /* wwEditor:start */
+      bindingValidation: {
+        type: 'array',
+        tooltip: 'Array of team/org member objects with id, name, avatar, role. When bound, all members appear in the timeline regardless of assigned tasks.',
+      },
+      /* wwEditor:end */
+    },
+    membersIdFormula: {
+      label: { en: 'Member ID Field' },
+      type: 'Formula',
+      section: 'settings',
+      options: content => ({
+        template: Array.isArray(content.members) && content.members.length > 0 ? content.members[0] : null,
+      }),
+      defaultValue: { type: 'f', code: "context.mapping?.['id']" },
+      hidden: (content, sidepanelContent, boundProps) =>
+        !Array.isArray(content.members) || !content.members?.length || !boundProps.members,
+    },
+    membersNameFormula: {
+      label: { en: 'Member Name Field' },
+      type: 'Formula',
+      section: 'settings',
+      options: content => ({
+        template: Array.isArray(content.members) && content.members.length > 0 ? content.members[0] : null,
+      }),
+      defaultValue: { type: 'f', code: "context.mapping?.['name']" },
+      hidden: (content, sidepanelContent, boundProps) =>
+        !Array.isArray(content.members) || !content.members?.length || !boundProps.members,
+    },
+    membersAvatarFormula: {
+      label: { en: 'Member Avatar Field' },
+      type: 'Formula',
+      section: 'settings',
+      options: content => ({
+        template: Array.isArray(content.members) && content.members.length > 0 ? content.members[0] : null,
+      }),
+      defaultValue: { type: 'f', code: "context.mapping?.['avatar']" },
+      hidden: (content, sidepanelContent, boundProps) =>
+        !Array.isArray(content.members) || !content.members?.length || !boundProps.members,
+    },
+    membersRoleFormula: {
+      label: { en: 'Member Role Field' },
+      type: 'Formula',
+      section: 'settings',
+      options: content => ({
+        template: Array.isArray(content.members) && content.members.length > 0 ? content.members[0] : null,
+      }),
+      defaultValue: { type: 'f', code: "context.mapping?.['role']" },
+      hidden: (content, sidepanelContent, boundProps) =>
+        !Array.isArray(content.members) || !content.members?.length || !boundProps.members,
+    },
+
     /* ── Formula mappings (shown only when tasks is bound) ── */
     tasksIdFormula: {
       label: { en: 'ID Field' },
