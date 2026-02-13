@@ -448,8 +448,30 @@ export default {
 
     const isDayView = computed(() => currentView.value === 'today' || currentView.value === 'tomorrow');
 
-    /* Members derived from RAW tasks (no overrides) — stable across drags */
+    /* ── Org / team members from dedicated prop ────── */
+    const rawMembers = computed(() => {
+      const raw = props.content?.members;
+      if (!Array.isArray(raw) || raw.length === 0) return [];
+      return raw.map(item => {
+        const id = resolveMappingFormula(props.content?.membersIdFormula, item) ?? item?.id;
+        const name = resolveMappingFormula(props.content?.membersNameFormula, item) ?? item?.name;
+        const avatar = resolveMappingFormula(props.content?.membersAvatarFormula, item) ?? item?.avatar;
+        const role = resolveMappingFormula(props.content?.membersRoleFormula, item) ?? item?.role;
+        return {
+          id: id || `member-${Math.random().toString(36).slice(2, 8)}`,
+          name: name || 'Unbekannt',
+          avatar: avatar || null,
+          role: role || '',
+        };
+      });
+    });
+
+    /* Members: prefer explicit members prop, fall back to task-derived */
     const members = computed(() => {
+      /* If an explicit members array is provided, use it */
+      if (rawMembers.value.length) return rawMembers.value;
+
+      /* Fallback: derive members from tasks */
       const map = {};
       rawTasks.value.forEach(t => {
         if (t.assigned_to && !map[t.assigned_to]) {
