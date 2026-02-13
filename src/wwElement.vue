@@ -466,16 +466,16 @@ export default {
       });
     });
 
-    /* Members: prefer explicit members prop, fall back to task-derived */
+    /* Members: merge explicit members with task-derived members so all
+       org members always appear, even those without assigned tasks */
     const members = computed(() => {
-      /* If an explicit members array is provided, use it */
-      if (rawMembers.value.length) return rawMembers.value;
+      const explicit = rawMembers.value;
 
-      /* Fallback: derive members from tasks */
-      const map = {};
+      /* Build task-derived members from assigned tasks */
+      const taskMap = {};
       rawTasks.value.forEach(t => {
-        if (t.assigned_to && !map[t.assigned_to]) {
-          map[t.assigned_to] = {
+        if (t.assigned_to && !taskMap[t.assigned_to]) {
+          taskMap[t.assigned_to] = {
             id: t.assigned_to,
             name: t.assignee_name || 'Unbekannt',
             avatar: t.assignee_avatar || null,
@@ -483,8 +483,18 @@ export default {
           };
         }
       });
-      const arr = Object.values(map);
-      if (arr.length) return arr;
+      const taskDerived = Object.values(taskMap);
+
+      if (explicit.length) {
+        /* Merge: all explicit members + any task-derived members not already in the list */
+        const explicitIds = new Set(explicit.map(m => String(m.id)));
+        const extra = taskDerived.filter(m => !explicitIds.has(String(m.id)));
+        return [...explicit, ...extra];
+      }
+
+      if (taskDerived.length) return taskDerived;
+
+      /* Default fallback (no data bound at all) */
       return [
         { id: 'm1', name: 'Alex Weber', avatar: null, role: 'Design' },
         { id: 'm2', name: 'Sarah Koch', avatar: null, role: 'Development' },
